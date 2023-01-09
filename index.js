@@ -1,6 +1,8 @@
 const inquirer = require("inquirer");
 const prompt = inquirer.createPromptModule();
 
+
+
 const options = [
 {
 type: "rawlist",
@@ -13,6 +15,11 @@ choices: ["view all departments", "view all roles", "view all employees", "add a
 const menu = () => {
     prompt(options).then((data) => {  
         const option = data.menuOption
+        if (option === "view all departments") {
+            console.log("test 1")
+        } else if (option === "view all roles") {
+            console.log("test 2")
+        }
         })
 }
 
