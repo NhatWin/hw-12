@@ -17,6 +17,7 @@
   },
   "homepage": "https://github.com/NhatWin/hw-12#readme",
   "dependencies": {
-    "inquirer": "^8.2.4"
+    "inquirer": "^8.2.4",
+    "mysql2": "^2.3.3"
   }
 }

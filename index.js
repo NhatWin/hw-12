@@ -1,7 +1,13 @@
+import mysql from "mysql2/promise";
+
+const conn = await mysql.createConnection({
+    host: "localhost",
+    user: "root",
+    database: "sample_db"
+})
+
 const inquirer = require("inquirer");
 const prompt = inquirer.createPromptModule();
-
-
 
 const options = [
 {
