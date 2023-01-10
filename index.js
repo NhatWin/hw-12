@@ -15,10 +15,10 @@ const createRolesList = () => {
   })
 };
 
-const createManagerList = () => {
+const createEmployeeList = () => {
     conn.promise().query("SELECT * FROM employees").then(([data]) => {
-        const managerData = data.map(({id, first_name, last_name}) => ({name:`${first_name} ${last_name}` , id:id})) 
-        return managerData;
+        const employeeData = data.map(({id, first_name, last_name}) => ({name:`${first_name} ${last_name}` , id:id})) 
+        return employeeData;
     })
 }
 
@@ -29,13 +29,28 @@ const allDepartments = () => {
     .then(([data]) => console.table(data));
 };
 
+const allRoles = () => {
+  conn
+    .promise()
+    .query("SELECT * FROM roles")
+    .then(([data]) => console.table(data));
+};
+
+const allEmployees = () => {
+  conn
+    .promise()
+    .query("SELECT * FROM employees")
+    .then(([data]) => console.table(data));
+};
+
+
 const addEmployee = (data) => {
   conn
     .promise()
     .query(
       `INSERT INTO employees (first_name, last_name, role_id, manager_id) VALUES(${data.first}, ${data.last}, ${data.role}, ${data.manager})`
     )
-    .then(() => console.log("information saved"));
+    .then(() => console.log("Employee added!"));
 };
 
 const updateEmployee = (data) => {
@@ -58,6 +73,7 @@ const options = [
       "add a role",
       "add an employee",
       "update an employee role",
+      "exit"
     ],
   },
 ];
@@ -68,7 +84,9 @@ const menu = () => {
     if (option === "view all departments") {
       allDepartments();
     } else if (option === "view all roles") {
-      console.log("test 2");
+      allRoles();
+    } else if (option === "view all employees") {
+      allEmployees();
     }
   });
 };
