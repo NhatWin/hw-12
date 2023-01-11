@@ -9,14 +9,19 @@ const conn = mysql.createConnection({
   password: "password123",
 });
 
+const departmentsList = async () => {
+  const departments = await conn.promise().query("SELECT * FROM departments")
+  return departments;
+}
+
 const rolesList = async () => {
   const roles = await conn.promise().query("SELECT * FROM roles")
   return roles;
 };
 
 const employeeList = async () => {
-  const roles = await conn.promise().query("SELECT * FROM employees")
-  return roles;
+  const employees = await conn.promise().query("SELECT * FROM employees")
+  return employees;
 }
 
 const allDepartments = () => {
@@ -40,6 +45,15 @@ const allEmployees = () => {
     .then(([data]) => console.table(data));
 };
 
+const addDepartment = (data) => {
+  conn.promise().query(`INSERT INTO departments (name) VALUES ("${data.department}");`)
+  .then(() => console.log("Department added!"));
+}
+
+const addRole = (data, departmentId) => {
+  conn.promise().query(`INSERT INTO roles (title, salary, department_id) VALUES ("${data.title}", ${data.pay}, ${departmentId.id});`)
+  .then(() => console.log("Department added!"));
+}
 
 const addEmployee = (data, roleId, managerId) => {
   conn
@@ -74,6 +88,40 @@ const options = [
     ],
   },
 ];
+
+const departmentQuestions = [
+  {
+    type: "input",
+    name: "department",
+    message: "Add new department."
+  }
+]
+
+const roleQuestions = (departments) => [
+  {
+    type: "input",
+    name: "title",
+    message: "What is the tite role?",
+  },
+  {
+    type: "input",
+    name: "pay",
+    message: "What is the role's salary?",
+    validate: (answer) => {
+      if (isNaN(answer)) {
+        return "Pleas enter a number";
+      } else {
+        return true;
+      }
+    },
+  },
+  {
+    type: "rawlist",
+    name: "department",
+    message: "What department is the role in?",
+    choices: departments,
+  }
+]
 
 const employeeQuestions = (roles, managers) => [
   {
@@ -115,6 +163,10 @@ const updateQuestions = (roles, empoyees) => [
   }
 ]
 
+const getName = (data) => {
+  return [data.name].join("")
+}
+
 const getTitle = (data) => {
   return [data.title].join("")
 }
@@ -133,9 +185,16 @@ const menu = () => {
     } else if (option === "view all employees") {
       allEmployees();
     } else if (option === "add a department") {
-
+      prompt(departmentQuestions).then(async(data) => {
+        addDepartment(data);
+      })
     } else if (option === "add a role") {
-
+      const [departments] = await departmentsList();
+      const departmentList = departments.map(getName);
+      prompt(roleQuestions(departmentList)).then(async(data) => {
+        const departmentId = departments.find(find => find.name === data.department)
+        addRole(data, departmentId)
+      })
     } else if (option === "add an employee") {
       const [roles] = await rolesList();
       const roleList = roles.map(getTitle);
