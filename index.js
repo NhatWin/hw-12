@@ -50,8 +50,8 @@ const addEmployee = (data, roleId, managerId) => {
     .then(() => console.log("Employee added!"));
 };
 
-const updateEmployee = (data) => {
-    conn.promise().query(`UPDATE employees SET role_id = ${data.roleId} WHERE id = ${data.employeeId}`).then(() => console.log("Employee role updated"))
+const updateEmployee = (roleId, employeeId) => {
+    conn.promise().query(`UPDATE employees SET role_id = ${roleId.id} WHERE id = ${employeeId.id}`).then(() => console.log("Employee role updated"))
 }
 
 const inquirer = require("inquirer");
@@ -100,6 +100,21 @@ const employeeQuestions = (roles, managers) => [
   }
 ]
 
+const updateQuestions = (roles, empoyees) => [
+  {
+    type: "rawlist",
+    name: "employee",
+    message: "Update an employee.",
+    choices: empoyees,
+  },
+  {
+    type: "rawlist",
+    name: "role",
+    message: "Change role.",
+    choices: roles,
+  }
+]
+
 const getTitle = (data) => {
   return [data.title].join("")
 }
@@ -131,6 +146,17 @@ const menu = () => {
         const managerArray = data.manager.split(" ")
         const managerId = manager.find(find => find.first_name === managerArray[0])
         addEmployee(data, roleId, managerId)
+      })
+    } else if (option === "update an employee role") {
+      const [roles] = await rolesList();
+      const roleList = roles.map(getTitle);
+      const [employee] = await employeeList();
+      const workerList = employee.map(getManager);
+      prompt(updateQuestions(roleList, workerList)).then((data) => {
+        const roleId = roles.find(find => find.title === data.role);
+        const employeeArray = data.employee.split(" ")
+        const employeeId = employee.find(find => find.first_name === employeeArray[0])
+        updateEmployee(roleId, employeeId)
       })
     }
   });
