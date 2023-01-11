@@ -28,21 +28,33 @@ const allDepartments = () => {
   conn
     .promise()
     .query("SELECT * FROM departments")
-    .then(([data]) => console.table(data));
+    .then(([data]) => 
+    console.table(data),
+    prompt(goBack).then(async() => {
+      menu();
+    }));
 };
 
 const allRoles = () => {
   conn
     .promise()
     .query("SELECT * FROM roles")
-    .then(([data]) => console.table(data));
+    .then(([data]) => 
+    console.table(data),
+    prompt(goBack).then(async() => {
+      menu();
+    }));
 };
 
 const allEmployees = () => {
   conn
     .promise()
     .query("SELECT * FROM employees")
-    .then(([data]) => console.table(data));
+    .then(([data]) => 
+    console.table(data),
+    prompt(goBack).then(async() => {
+      menu();
+    }));
 };
 
 const addDepartment = (data) => {
@@ -163,6 +175,15 @@ const updateQuestions = (roles, empoyees) => [
   }
 ]
 
+const goBack = [
+  {
+    type: "rawlist",
+    name: "manager",
+    message: "Return to main menu",
+    choices: ["<<GO BACK"]
+  }
+]
+
 const getName = (data) => {
   return [data.name].join("")
 }
@@ -187,6 +208,7 @@ const menu = () => {
     } else if (option === "add a department") {
       prompt(departmentQuestions).then(async(data) => {
         addDepartment(data);
+        menu();
       })
     } else if (option === "add a role") {
       const [departments] = await departmentsList();
@@ -194,6 +216,7 @@ const menu = () => {
       prompt(roleQuestions(departmentList)).then(async(data) => {
         const departmentId = departments.find(find => find.name === data.department)
         addRole(data, departmentId)
+        menu();
       })
     } else if (option === "add an employee") {
       const [roles] = await rolesList();
@@ -204,7 +227,8 @@ const menu = () => {
         const roleId = roles.find(find => find.title === data.role);
         const managerArray = data.manager.split(" ")
         const managerId = manager.find(find => find.first_name === managerArray[0])
-        addEmployee(data, roleId, managerId)
+        addEmployee(data, roleId, managerId);
+        menu();
       })
     } else if (option === "update an employee role") {
       const [roles] = await rolesList();
@@ -215,8 +239,12 @@ const menu = () => {
         const roleId = roles.find(find => find.title === data.role);
         const employeeArray = data.employee.split(" ")
         const employeeId = employee.find(find => find.first_name === employeeArray[0])
-        updateEmployee(roleId, employeeId)
+        updateEmployee(roleId, employeeId);
+        menu();
       })
+    } else {
+      console.log("Goodbye");
+      conn.end();
     }
   });
 };
