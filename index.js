@@ -9,18 +9,14 @@ const conn = mysql.createConnection({
   password: "password123",
 });
 
-const rolesList = () => {
-  conn.promise().query("SELECT * FROM roles").then(([data]) => {
-    const roleData = data.map(({id, title}) => ({name:title, id:id})) 
-    return roleData;
-  })
+const rolesList = async () => {
+  const roles = await conn.promise().query("SELECT * FROM roles")
+  return roles;
 };
 
-const EmployeeList = () => {
-    conn.promise().query("SELECT * FROM employees").then(([data]) => {
-        const employeeData = data.map(({id, first_name, last_name}) => ({name:`${first_name} ${last_name}` , id:id})) 
-        return employeeData;
-    })
+const employeeList = async () => {
+  const roles = await conn.promise().query("SELECT * FROM employees")
+  return roles;
 }
 
 const allDepartments = () => {
@@ -45,11 +41,11 @@ const allEmployees = () => {
 };
 
 
-const addEmployee = (data) => {
+const addEmployee = (data, roleId, managerId) => {
   conn
     .promise()
     .query(
-      `INSERT INTO employees (first_name, last_name, role_id, manager_id) VALUES(${data.first}, ${data.last}, ${data.role}, ${data.manager})`
+      `INSERT INTO employees (first_name, last_name, role_id, manager_id) VALUES("${data.first}", "${data.last}", ${roleId.id}, ${managerId.id});`
     )
     .then(() => console.log("Employee added!"));
 };
@@ -79,10 +75,10 @@ const options = [
   },
 ];
 
-const employeeQuestions = (data) => [
+const employeeQuestions = (roles, managers) => [
   {
     type: "input",
-    name: "fist",
+    name: "first",
     message: "What is the employee's first name?",
   },
   {
@@ -94,12 +90,26 @@ const employeeQuestions = (data) => [
     type: "rawlist",
     name: "role",
     message: "What is the employee's role?",
-    // choices: data.map(role => role.name),
+    choices: roles,
   },
+  {
+    type: "rawlist",
+    name: "manager",
+    message: "What is the employee's manager?",
+    choices: managers,
+  }
 ]
 
+const getTitle = (data) => {
+  return [data.title].join("")
+}
+
+const getManager = (data) => {
+  return [`${data.first_name} ${data.last_name}`].join("")
+}
+
 const menu = () => {
-  prompt(options).then((data) => {
+  prompt(options).then(async(data) => {
     const option = data.menuOption;
     if (option === "view all departments") {
       allDepartments();
@@ -112,7 +122,16 @@ const menu = () => {
     } else if (option === "add a role") {
 
     } else if (option === "add an employee") {
-       rolesList().then((data) => console.log(data));
+      const [roles] = await rolesList();
+      const roleList = roles.map(getTitle);
+      const [manager] = await employeeList();
+      const managerList = manager.map(getManager);
+      prompt(employeeQuestions(roleList, managerList)).then((data) => {
+        const roleId = roles.find(find => find.title === data.role);
+        const managerArray = data.manager.split(" ")
+        const managerId = manager.find(find => find.first_name === managerArray[0])
+        addEmployee(data, roleId, managerId)
+      })
     }
   });
 };
