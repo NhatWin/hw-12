@@ -1,6 +1,7 @@
 require("console.table");
 const mysql = require("mysql2");
 
+
 const conn = mysql.createConnection({
   host: "localhost",
   user: "root",
@@ -8,14 +9,14 @@ const conn = mysql.createConnection({
   password: "password123",
 });
 
-const createRolesList = () => {
+const rolesList = () => {
   conn.promise().query("SELECT * FROM roles").then(([data]) => {
     const roleData = data.map(({id, title}) => ({name:title, id:id})) 
     return roleData;
   })
 };
 
-const createEmployeeList = () => {
+const EmployeeList = () => {
     conn.promise().query("SELECT * FROM employees").then(([data]) => {
         const employeeData = data.map(({id, first_name, last_name}) => ({name:`${first_name} ${last_name}` , id:id})) 
         return employeeData;
@@ -78,6 +79,25 @@ const options = [
   },
 ];
 
+const employeeQuestions = (data) => [
+  {
+    type: "input",
+    name: "fist",
+    message: "What is the employee's first name?",
+  },
+  {
+    type: "input",
+    name: "last",
+    message: "What is the employee's last name?",
+  },
+  {
+    type: "rawlist",
+    name: "role",
+    message: "What is the employee's role?",
+    // choices: data.map(role => role.name),
+  },
+]
+
 const menu = () => {
   prompt(options).then((data) => {
     const option = data.menuOption;
@@ -87,8 +107,13 @@ const menu = () => {
       allRoles();
     } else if (option === "view all employees") {
       allEmployees();
+    } else if (option === "add a department") {
+
+    } else if (option === "add a role") {
+
+    } else if (option === "add an employee") {
+       rolesList().then((data) => console.log(data));
     }
   });
 };
-console.log(allDepartments);
 menu();
