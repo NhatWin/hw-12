@@ -32,7 +32,3 @@ CREATE TABLE employees (
     FOREIGN KEY (manager_id)
     REFERENCES employees(id)
 )
-
-joins: role on roles.id = employee.role.id 
-
-department on department.id = roles.department_id

@@ -27,34 +27,22 @@ const employeeList = async () => {
 const allDepartments = () => {
   conn
     .promise()
-    .query("SELECT * FROM departments")
-    .then(([data]) => 
-    console.table(data),
-    prompt(goBack).then(async() => {
-      menu();
-    }));
+    .query("SELECT * FROM departments") 
+    .then(([data]) => console.table(data));
 };
 
 const allRoles = () => {
   conn
     .promise()
-    .query("SELECT * FROM roles")
-    .then(([data]) => 
-    console.table(data),
-    prompt(goBack).then(async() => {
-      menu();
-    }));
+    .query("SELECT roles.id, roles.title, departments.name AS department, roles.salary FROM roles INNER JOIN roles ON employees.role_id = roles.id, departments ON employees.role_id = roles.department_id;")
+    .then(([data]) => console.table(data));
 };
 
 const allEmployees = () => {
   conn
     .promise()
-    .query("SELECT * FROM employees")
-    .then(([data]) => 
-    console.table(data),
-    prompt(goBack).then(async() => {
-      menu();
-    }));
+    .query("SELECT employees.id, employees.first_name, employees.last_name, roles.title, departments.name AS department, roles.salary, CONCAT(manager.first_name, ' ', manager.last_name) AS manager FROM employees INNER JOIN roles ON employees.role_id = roles.id JOIN departments ON roles.department_id = departments.id JOIN employees manager on manager.id = employees.manager_id;")
+    .then(([data]) => console.table(data))
 };
 
 const addDepartment = (data) => {
@@ -172,15 +160,6 @@ const updateQuestions = (roles, empoyees) => [
     name: "role",
     message: "Change role.",
     choices: roles,
-  }
-]
-
-const goBack = [
-  {
-    type: "rawlist",
-    name: "manager",
-    message: "Return to main menu",
-    choices: ["<<GO BACK"]
   }
 ]
 
