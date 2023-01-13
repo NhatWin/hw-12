@@ -34,7 +34,7 @@ const allDepartments = () => {
 const allRoles = () => {
   conn
     .promise()
-    .query("SELECT roles.id, roles.title, departments.name AS department, roles.salary FROM roles INNER JOIN roles ON employees.role_id = roles.id, departments ON employees.role_id = roles.department_id;")
+    .query("SELECT roles.id, roles.title, departments.name AS department, roles.salary FROM roles INNER JOIN departments ON roles.department_id = departments.id;")
     .then(([data]) => console.table(data));
 };
 
