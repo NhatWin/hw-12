@@ -14,7 +14,7 @@ This program can be used to view a company's database with information about dep
 
 ## Video
 
-
+https://drive.google.com/file/d/1W5HcGrZfmTEkD_D4xB0Tr0G0eo0QuexB/view 
 
 ## Credits
 
